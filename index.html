@@ -175,7 +175,8 @@ tfoot td{font-weight:700;border-bottom:none;padding-top:12px;color:var(--mu);fon
   <div class="ff">
     <div class="fr2">
       <div class="fd"><label>Fecha</label><input type="date" id="ff-f"/></div>
-      <div class="fd" style="flex:2"><label>Proveedor</label><input type="text" id="ff-p" placeholder="Ej: Repuestos Cuyo S.A."/></div>
+      <div class="fd" style="flex:2"><label>Proveedor</label><input type="text" id="ff-p" placeholder="Ej: Repuestos Cuyo S.A." list="ff-dl"/></div>
+        <datalist id="ff-dl"></datalist>
       <div class="fd"><label>N° Factura</label><input type="text" id="ff-n" placeholder="0001-00012345"/></div>
     </div>
     <div class="fr2">
@@ -330,7 +331,7 @@ function parsearDetalles(desc){
 function fm(n){return new Intl.NumberFormat("es-AR",{style:"currency",currency:"ARS",maximumFractionDigits:0}).format(n||0);}
 function td(){return new Date().toISOString().slice(0,10);}
 var yr=new Date().getFullYear();
-var db,gastos=[],eD="todos",eH="todos",eF="100",eE="100",delId=null,editId=null;
+var db,gastos=[],eD="todos",eH="todos",eF="100",eE="100",delId=null,editId=null,proveedores=[];
 
 window.onload=function(){
   db=window.supabase.createClient(SB_URL,SB_KEY);
@@ -345,6 +346,7 @@ window.onload=function(){
   document.getElementById("hh").value=yr+"-12-31";
   bP("pfF","F");bP("pfD","D");bP("pfH","H");
   document.getElementById("ff-lbl-uso").textContent="Uso ("+obtenerUnidadUso(eF)+")";
+  cargarProveedores();
   rD();
   poblarAnios();
   db.from("gastos").select("*").order("fecha",{ascending:false}).then(function(r){
@@ -361,6 +363,14 @@ function poblarAnios(){
   var actual=sel.value||String(yr);
   sel.innerHTML=lista.map(function(a){return'<option value="'+a+'"'+(a===actual?' selected':'')+'>'+a+'</option>';}).join("");
 };
+
+function cargarProveedores(){
+  var pr=[];
+  gastos.forEach(function(g){if(g.proveedor&&pr.indexOf(g.proveedor)===-1)pr.push(g.proveedor);});
+  proveedores=pr.sort();
+  var dl=document.getElementById("ff-dl");
+  if(dl)dl.innerHTML=proveedores.map(function(p){return'<option value="'+p+'"/>';}).join("");
+}
 
 function st(msg,cls){
   var e=document.getElementById("hst");
@@ -788,7 +798,7 @@ function grd(){
         document.getElementById("ff-s").value="Otros";
         document.getElementById("ff-f").value=td();
         setTimeout(function(){msg.innerHTML="";},4000);
-        db.from("gastos").select("*").order("fecha",{ascending:false}).then(function(r2){if(r2.data)gastos=r2.data;});
+        db.from("gastos").select("*").order("fecha",{ascending:false}).then(function(r2){if(r2.data){gastos=r2.data;cargarProveedores();}});
       });
     });
   }else{
@@ -802,8 +812,8 @@ function grd(){
       document.getElementById("ff-tm").value="Preventivo";
       document.getElementById("ff-s").value="Otros";
       document.getElementById("ff-f").value=td();
-      setTimeout(function(){msg.innerHTML="";},4000);
-      db.from("gastos").select("*").order("fecha",{ascending:false}).then(function(r2){if(r2.data)gastos=r2.data;});
+setTimeout(function(){msg.innerHTML="";},4000);
+        db.from("gastos").select("*").order("fecha",{ascending:false}).then(function(r2){if(r2.data){gastos=r2.data;cargarProveedores();if(r2.data)rD();}});
     });
   }
 }
@@ -866,7 +876,7 @@ function doEdit(){
     if(r.error){st("Error","ser");msg.innerHTML="<div class=\"mer\">"+r.error.message+"</div>";return;}
     st("✓ Guardado","sok");
     document.getElementById("medit").classList.add("h");editId=null;
-    db.from("gastos").select("*").order("fecha",{ascending:false}).then(function(r2){if(r2.data){gastos=r2.data;rH();}});
+    db.from("gastos").select("*").order("fecha",{ascending:false}).then(function(r2){if(r2.data){gastos=r2.data;cargarProveedores();rH();}});
   });
 }
 function verFoto(url){
