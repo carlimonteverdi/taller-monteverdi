@@ -500,7 +500,6 @@ function rD(){
   document.getElementById("sts").innerHTML=
     "<div class=\"st\"><div class=\"sl\">Total gastado</div><div class=\"sv2\" style=\"color:var(--ac)\">"+fm(tot)+"</div></div>"+
     "<div class=\"st\"><div class=\"sl\">Facturas</div><div class=\"sv2\">"+cn+"</div></div>"+
-    "<div class=\"st\"><div class=\"sl\">Promedio</div><div class=\"sv2\">"+fm(pr)+"</div></div>"+
     "<div class=\"st\"><div class=\"sl\">Mayor gasto</div><div class=\"sv2\" style=\"font-size:14px\">"+(my?my.q+" · "+fm(my.tot):"—")+"</div></div>";
   var mx=Math.max.apply(null,pe.map(function(e){return e.tot;}).concat([1]));
   var bW=30,gp=12,H=180,pT=18,pB=28,TW=EQS.length*(bW+gp);
@@ -512,7 +511,7 @@ function rD(){
     sv+="<rect x=\""+x+"\" y=\""+y+"\" width=\""+bW+"\" height=\""+bH+"\" rx=\"3\" fill=\""+inf.c+"\" opacity=\".9\"/>";
     var lb=e.q.length>3?e.q.slice(0,3):e.q;
     sv+="<text x=\""+(x+bW/2)+"\" y=\""+(pT+H+18)+"\" text-anchor=\"middle\" fill=\"#ada79e\" font-size=\"10\" font-family=\"Helvetica Neue,Arial\">"+lb+"</text>";
-    if(e.tot>0){var kv=e.tot>=1000?Math.round(e.tot/1000)+"k":e.tot;sv+="<text x=\""+(x+bW/2)+"\" y=\""+(y-4)+"\" text-anchor=\"middle\" fill=\"#f7f4ee\" font-size=\"8.5\" font-family=\"Helvetica Neue,Arial\">"+kv+"</text>";}
+    if(e.tot>0){var kv=e.tot>=1000000?(e.tot/1000000).toFixed(1)+"M":e.tot>=1000?Math.round(e.tot/1000)+"k":e.tot;sv+="<text x=\""+(x+bW/2)+"\" y=\""+(y-4)+"\" text-anchor=\"middle\" fill=\"#f7f4ee\" font-size=\"8.5\" font-family=\"Helvetica Neue,Arial\">"+kv+"</text>";}
   });
   sv+="</svg>";
   document.getElementById("cb").innerHTML=sv;
